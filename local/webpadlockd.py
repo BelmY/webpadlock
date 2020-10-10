@@ -74,13 +74,13 @@ def init():
     key = load_private(config["private_key"])
     cert = load_public(config["certificate"])
 
-    origin_data = {}
-    origin_data["nonce"] = "f01253ff497eae7fa1555c34a822c2498835c58b"
+    requestdata = {}
+    requestdata["nonce"] = "f01253ff497eae7fa1555c34a822c2498835c58b"
 
     claims = {}
     claims["systeminfo"] = get_systeminfo()
     claims["metadata"] = get_metadata()
-    claims["origin"] = origin_data
+    claims["requestdata"] = requestdata
 
     token = create_jwt(key, cert, claims)
     print(token)
