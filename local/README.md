@@ -69,6 +69,7 @@ Example:
 
 ## TODO
 
+- configuration file
 - web server origin domains filter
 - cors headers
 - daemonize

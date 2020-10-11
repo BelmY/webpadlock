@@ -1,3 +1,10 @@
+# -----------------------------------------------------------
+# Web Padlock
+#
+# (C) 2020 Reinoso Guzman, Madrid, Spain
+# Released under MIT License
+# -----------------------------------------------------------
+
 import json
 import logging
 from flask import Flask, request
