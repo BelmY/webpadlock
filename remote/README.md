@@ -19,3 +19,8 @@ checks:
 - request parameters (nonce)
 - cert cn vs system hostname
 - system information parameters
+
+Todo:
+
+- https
+- separate files
