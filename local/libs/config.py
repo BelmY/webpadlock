@@ -6,6 +6,7 @@ def get_config():
     config["log_level"] = 10  # logging.DEBUG
     config["http_port"] = 3000
     config["listen_ip"] = "127.0.0.1"
+    config["allowed_requesters"] = ["http://127.0.0.1:10000"]  # for CORS
 
     return config
 

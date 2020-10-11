@@ -8,6 +8,7 @@ Requirements:
 
 - jwcrypto
 - flask
+- flask-cors
 - platform
 - json
 

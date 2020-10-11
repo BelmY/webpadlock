@@ -8,6 +8,7 @@
 import json
 import logging
 from flask import Flask, request
+from flask_cors import CORS
 
 from libs.systeminfo import get_systeminfo
 from libs.config import get_config
@@ -50,6 +51,8 @@ if __name__ == '__main__':
 
     key = load_private(config["private_key"])
     cert = load_cert(config["certificate"])
+
+    CORS(app, origins=config["allowed_requesters"])
 
     app.run(host=config["listen_ip"],
             port=config["http_port"])
