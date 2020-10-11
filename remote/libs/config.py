@@ -3,8 +3,10 @@ def get_config():
     config = {}
     config["cacert"] = "workstation001-cert.pem"
     config["log_level"] = 10  # logging.DEBUG
-    config["http_port"] = 8080
+    config["http_port"] = 10000
     config["listen_ip"] = "0.0.0.0"
+    config["session_secret"] = "webpadlock"
+    config["local_server_url"] = "http://127.0.0.1:3000/deviceinfo"
 
     return config
 

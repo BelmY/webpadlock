@@ -1,0 +1,9 @@
+import random
+import string
+
+
+def get_random_string(length = 40):
+    """ Return a random string """
+    letters = string.ascii_letters
+    result_str = ''.join(random.choice(letters) for i in range(length))
+    return result_str

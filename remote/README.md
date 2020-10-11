@@ -7,6 +7,7 @@ Requirements:
 - jwcrypto
 - cryptography
 - pyopenssl
+- flask
 
 cacert = workstation001 (self signed)
 
