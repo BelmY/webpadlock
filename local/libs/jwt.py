@@ -1,6 +1,7 @@
 from jwcrypto import jwk, jwt
 from jwcrypto.common import json_encode
 import logging
+import time
 
 
 def load_private(file):
@@ -45,6 +46,7 @@ def create_jwt(key, cert, systeminfo, metadata, requestdata):
     """
 
     claims = {}
+    claims["iat"] = int(time.time())
     claims["systeminfo"] = systeminfo
     claims["metadata"] = metadata
     claims["requestdata"] = requestdata
