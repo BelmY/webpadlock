@@ -27,7 +27,7 @@ def load_cert(file):
 
 def jwt_header(cert):
     """Return a dict with the JWT header.
-    cert: stripped certificate chain. 
+    cert: array of stripped certificate chain. 
     The first is always the one used for signing."""
     header = {}
     header["alg"] = "RS256"
@@ -43,7 +43,7 @@ def create_jwt(key, cert, systeminfo, metadata, requestdata):
     metadata: Claim "metadata" (webpadlock version, etc)
     requestdata: Claim "requestdata" (copied form the request)
     """
-    
+
     claims = {}
     claims["systeminfo"] = systeminfo
     claims["metadata"] = metadata
@@ -51,7 +51,7 @@ def create_jwt(key, cert, systeminfo, metadata, requestdata):
 
     logging.debug("Claims:{}".format(json_encode(claims)))
 
-    token = jwt.JWT(header=json_encode(jwt_header(cert)),
+    token = jwt.JWT(header=json_encode(jwt_header([cert])),
                     claims=json_encode(claims))
 
     token.make_signed_token(key)
