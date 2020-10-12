@@ -19,7 +19,7 @@ Each device must have its own certificate. The CN must be equal to the hostname.
 
 The local server creates a token with information about the host system, software metadata and all request parameters. The token is signed using the certificate's private key. And the certificate itself is added to the x5c header.
 
-Please see (local/README.md) for a more detalied explanation.
+Please see [Local README](/local/README.md) for a more detalied explanation.
 
 ### Remote server
 
@@ -31,7 +31,7 @@ The remote acces control can use the verified token claims and make aditional va
 
 In the demo server page the button named "test me" call a funcion that requests a token from the local server and send it back to the demo  server. Applies validations and writes an HTML message.
 
-For more information read (remote/README.md).
+For more information read [Remote README](/remote/README.md).
 
 ## Install and run
 
@@ -109,71 +109,20 @@ If you want to test some previously saved tokens you can use the command line va
 
 To run the demo server use the command `server.py`. Check (remote/README.md) for requirements.
 
-Browse to http://127.0.0.1:10000/
+Navigate to [http://127.0.0.1:10000/](http://127.0.0.1:10000/)
 
 If you change the domain (or use localhost instead of IP) don't forget to it to the allowed requesters in local service configuration.
 
 ## Testing
 
-Run both local and remote servers. Open http://127.0.0.1:10000/ and click "test me". If all goes right a message like this wil appear:
+Run both local and remote servers. Open [http://127.0.0.1:10000/](http://127.0.0.1:10000/).
 
-    Great! Now you can log-in
-    INFO: Token integrity OK
-    INFO: Token succesfully decoded. Claims are:
-    {
-        "iat": 1602528974,
-        "metadata": {
-            "name": "Web Padlock",
-            "response-id": "LkuZcrRArwOqFamLBMDmozMmHmoiGuqOhFqVPxEo",
-            "version": {
-                "mayor": "1",
-                "minor": "0"
-            }
-        },
-        "requestdata": {
-            "requestId": "UPzeCpNQCBSXVZFNqpww"
-        },
-        "systeminfo": {
-            "hostname": "myhostname",
-            "osname": "Windows",
-            "osrelease": "8.1",
-            "osversion": "6.3.9600",
-            "user": "Reinoso"
-        }
-    }
-    INFO: Certificate verification OK
-    INFO: System hostname matches certificate CN.
-    INFO: Token is for the expected request.
-    INFO: Token is on-time.
+![Test-me button](/img/test-me.jpg)
 
-If some of the validations fails, your device won't be allowed. Like using non approved certificate to sign the token:
+If all goes right a message like this will appear when you click test-me:
 
-    Device not allowed!
-    INFO: Token integrity OK
-    INFO: Token succesfully decoded. Claims are:
+![Success](/img/success.jpg)
 
-    {
-        "iat": 1602529112,
-        "metadata": {
-            "name": "Web Padlock",
-            "response-id": "iLHCPRjdoTDEEaboORvyYQlOYpvfSkjWGlpQjumV",
-            "version": {
-                "mayor": "1",
-                "minor": "0"
-            }
-        },
-        "requestdata": {
-            "requestId": "aaayjyKgZnWLBvQIeUhO"
-        },
-        "systeminfo": {
-            "hostname": "android-a2bdf5",
-            "osname": "Windows",
-            "osrelease": "8.1",
-            "osversion": "6.3.9600",
-            "user": "Reinoso"
-        }
-    }
-    WARNING: Certificate verification failed: [18, 0, 'self signed certificate']
-    WARNING: Certificate/Host name mismatch.
-    INFO: Token is for the expected request.
-    INFO: Token is on-time.
+If some of the validations fails, your device won't be allowed. Let's say you are using the certificate in another host:
+
+![Login failed](/img/warnings.jpg)
