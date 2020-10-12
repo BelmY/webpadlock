@@ -26,6 +26,10 @@ Return information about specific platform the software is running. Like this:
         "user": "user001"
     }
 
+Note *user* is not the logged user, but the user running the daemon.
+
+You can customize these fields in systeminfo.py.
+
 ## metadata.py
 
 Return information about this software. As well as a random response identifier.

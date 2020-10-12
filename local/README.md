@@ -71,8 +71,8 @@ Example:
 ## TODO
 
 - configuration file
+- document config options
 - web server origin domains filter
-- cors headers
 - daemonize
 - certificate chain
 - check key permissions
