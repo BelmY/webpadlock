@@ -33,8 +33,10 @@ function fillStatusDiv(
     div = document.getElementById('status_div');
 
     div.innerHTML = `
-        <p class="${cssclass}"><span class="statusMsg">${status}<span></p>
-        <p class="${cssclass}"><span class="causeMsg">${message}</span></p>
+        <div class="${cssclass}">
+            <p class="statusMsg">${status}</p>
+            <p class="causeMsg">${message}</p>
+        </div>
         `;
 }
 
@@ -77,7 +79,7 @@ function processToken(token) {
             if (req.status === 200) {
                 processTokenResult(req.responseText);
             } else {
-                errorProcessingToken(req.status);
+                errorProcessingToken(req.status, req.responseText);
             }
         }
     };
@@ -86,17 +88,30 @@ function processToken(token) {
 }
 
 
-function errorProcessingToken(msg) {
-    fillStatusDiv(
-        "Error processing your token",
-        "HTTP status code: " + msg,
-        "error"
-    );
+function errorProcessingToken(status, msg) {
+    switch (status) {
+        case 401:
+            fillStatusDiv(
+                "Device not allowed",
+                msg,
+                "error"
+            );
+            break;
+        default:
+            fillStatusDiv(
+                "Error processing your token",
+                "HTTP status code: " + status,
+                "error"
+            );
+    }
 }
 
 
 function processTokenResult(msg) {
-    fillStatusDiv("Ok", msg);
-
+    fillStatusDiv(
+        "Great! Now you can log-in",
+        msg,
+        "success"
+    );
 }
 
