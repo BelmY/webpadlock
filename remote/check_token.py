@@ -3,50 +3,55 @@ import logging
 from jwcrypto import jwt, jwk, jws
 
 
-from libs.crypto import jwt_pemchain, \
-    verify_certificate_using_other, \
-    validate_token, \
-    get_cert_cn
+from libs.crypto import verify_pem_chain, validate_token
 from libs.config import get_config
-
-
-def load_file(file):
-    with open(file, "r") as fileh:
-        return fileh.read()
+from libs.utils import load_file
+from libs.jwtchecks import check_hostname, check_request_param
 
 
 config = get_config()
 logging.basicConfig(level=config["log_level"])
 
-testtoken = load_file("testtoken.dat")
-pemchain = jwt_pemchain(testtoken)
-
-# Check certificate chain
 pemcacert = load_file(config["cacert"])
-
-if (verify_certificate_using_other(pemchain[0], pemcacert)):
-    logging.info("Certificate verification OK")
-else:
-    logging.warning("Certificate verification failed")
-
+testtoken = load_file("testtoken.dat")
 
 # Check token signature
-claims = validate_token(testtoken, pemchain[0])
+try:
+    pemchain, claims = validate_token(testtoken)
+    logging.info("Decoding token ok")
+except (jws.InvalidJWSSignature) as e:
+    logging.fatal("Token signature verification failed.")
+    exit()
+except Exception as e:
+    logging.fatal("Decoding token failed: {}".format(e))
+    exit()
+
+# Check certificate chain
+try:
+    verify_pem_chain(pemchain, pemcacert)
+    logging.info("Certificate verification OK")
+except Exception as e:
+    logging.warning("Certificate verification failed.")
 
 
 # Check hostname
-cert_cn = get_cert_cn(pemchain[0])
-hostname = claims["systeminfo"]["hostname"]
+try:
+    if (check_hostname(pemchain, claims)):
+        logging.info("System hostname matches certificate CN.")
+    else:
+        logging.warning("Certificate/Host name mismatch.")
 
-if (cert_cn == hostname):
-    logging.info("System hostname matches certificate CN.")
-else:
-    logging.warning("Host mismatch. Hostname is {}, but certificate is for {}.".format(
-        hostname,
-        cert_cn
-    ))
+except Exception:
+    logging.warning("Error matching hostname.")
+
 
 # Check that this response is for my last request
-request_id = claims["requestdata"]["nonce"]
+req_nonce = "f01253ff497eae7fa1555c34a822c2498835c58b"
+try:
+    if (check_request_param(req_nonce, claims, "nonce")):
+        logging.info("Token is for the expected request.")
+    else:
+        logging.warning("Token is for another request.")
 
-print("Request Id is {}.".format(request_id))
+except Exception:
+    logging.warning("Token format unknown.")

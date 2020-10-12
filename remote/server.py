@@ -11,9 +11,11 @@ from flask import Flask, request, render_template, session
 
 from libs.config import get_config
 from libs.randomstr import get_random_string
-
+from libs.utils import load_file
+from libs.jwt_checks import check_sign_cert
 
 global config
+global pemcacert
 
 
 app = Flask(__name__,
@@ -46,6 +48,9 @@ if __name__ == '__main__':
 
     config = get_config()
     logging.basicConfig(level=config["log_level"])
+
+    pemcacert = load_file(config["cacert"])
+    logging.info("Loaded CA certificate from {}.".format(config["cacert"]))
 
     app.secret_key = config["session_secret"]
     app.run(host=config["listen_ip"],

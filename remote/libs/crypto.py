@@ -2,8 +2,6 @@ import json
 import logging
 from OpenSSL import crypto
 from jwcrypto import jwt, jwk, jws
-from cryptography import x509
-from cryptography.x509.oid import NameOID
 
 
 def jwt_pemchain(token):
@@ -27,28 +25,24 @@ def jwt_pemchain(token):
     return pemchain
 
 
-def validate_token(jwt_str, pem_data):
+def validate_token(jwt_str):
     """ Check token signature using the first certificate as key.
     You also MUST validate that certificate by another way.
 
     jwt_str: serialized jwt data
-    pem_data: certificate in PEM format
-    Return a dict with token claims"""
+    Return an array of PEM certs, and a dict with token claims
+    Exception on failure. """
 
-    key = jwk.JWK.from_pem(pem_data)
+    pemchain = jwt_pemchain(jwt_str)
+
+    key = jwk.JWK.from_pem(pemchain[0])
     token = jwt.JWT(jwt=jwt_str, key=key)
-    return json.loads(token.claims)
-
-
-def get_cert_cn(pem_data):
-    """ Return the CN of the certificate given in pem_data. """
-
-    cert = x509.load_pem_x509_certificate(pem_data)
-    cn = cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[0].value
-    return cn
+    return pemchain, json.loads(token.claims)
 
 
 def verify_certificate_using_other(pem_incognito, pem_trusted):
+    """ Verify one certificate in the context of another trusted. 
+    Return true if Ok, Exception in failure """
     store = crypto.X509Store()
 
     # Add trusted cert
@@ -59,10 +53,12 @@ def verify_certificate_using_other(pem_incognito, pem_trusted):
     incognito = crypto.load_certificate(crypto.FILETYPE_PEM, pem_incognito)
     store_ctx = crypto.X509StoreContext(store, incognito)
 
-    try:
-        store_ctx.verify_certificate()
-        return True
+    store_ctx.verify_certificate()
+    return True
 
-    except Exception as e:
-        logging.warning(e)
-        return False
+
+def verify_pem_chain(pemchain, pemca):
+    """ Verify the certificate chain. 
+    NOTE: Only two at the moment. 
+    Return true if Ok, Exception in failure. """
+    return verify_certificate_using_other(pemchain[0], pemca)
