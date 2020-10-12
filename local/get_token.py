@@ -19,7 +19,7 @@ def run():
     cert = load_cert(config["certificate"])
 
     requestdata = {}
-    requestdata["nonce"] = "f01253ff497eae7fa1555c34a822c2498835c58b"
+    requestdata["requestId"] = "f01253ff497eae7fa1555c34a822c2498835c58b"
 
     token = create_jwt(
         key,

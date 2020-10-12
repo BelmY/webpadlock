@@ -111,7 +111,7 @@ def webcheck(token):
         if int(time.time()) - session["timeof"] < 10:
             msg.append("INFO: Token is on-time.")
         else:
-            msg.append("WARNING: Token is delayed, reload the page.")
+            msg.append("WARNING: Token wait expired, reload the page.")
             status = 401
 
     except Exception:

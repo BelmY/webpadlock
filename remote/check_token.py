@@ -40,10 +40,6 @@ except Exception as e:
     exit()
 
 
-print("Token claims: ")
-print(json.dumps(claims, sort_keys=True, indent=4))
-
-
 # Check certificate chain
 try:
     verify_pem_chain(pemchain, pemcacert)
@@ -63,13 +59,5 @@ except Exception:
     logging.error("Error matching hostname.")
 
 
-# Check that this response is for my last request
-req_nonce = "f01253ff497eae7fa1555c34a822c2498835c58b"
-try:
-    if check_request_param(req_nonce, claims, "nonce"):
-        logging.info("Token is for the expected request.")
-    else:
-        logging.warning("Token is for another request.")
-
-except Exception:
-    logging.error("Token format unknown.")
+print("Token claims: ")
+print(json.dumps(claims, sort_keys=True, indent=4))

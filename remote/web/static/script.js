@@ -33,9 +33,13 @@ function fillStatusDiv(
     div = document.getElementById('status_div');
 
     div.innerHTML = `
-        <div class="${cssclass}">
-            <p class="statusMsg">${status}</p>
-            <p class="causeMsg">${message}</p>
+        <div class="result ${cssclass}">
+            <div class="statusMsg">
+                <p>${status}</p>
+            </div>
+            <div class="causeMsg">
+                ${message}
+            </div>
         </div>
         `;
 }
@@ -94,7 +98,7 @@ function errorProcessingToken(status, msg) {
             fillStatusDiv(
                 "Device not allowed",
                 msg,
-                "error"
+                "warning"
             );
             break;
         default:

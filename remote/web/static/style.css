@@ -10,3 +10,18 @@ h1 {
     font-weight: normal;
     margin-top: 5px;
 }
+
+.statusMsg {
+    font-size: large;
+    text-decoration: underline;
+}
+
+.causeMsg {
+    font-size: small;
+    padding-left: 1em;
+}
+
+div.result {
+    padding: 5;
+    margin-top: 5;
+}
