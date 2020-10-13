@@ -33,6 +33,41 @@ In the demo server page the button named "test me" call a funcion that requests 
 
 For more information read [Remote README](/remote/README.md).
 
+## Public demo
+
+If you only want to try this software, just download the [latest release](releases).
+
+You will need:
+
+- **server.exe**: local agent.
+- **config.json**: configuration file
+- **workstation001.key.pem** and **workstation001.key.pem** example host certificates.
+
+Put all the files in the same folder and run `server.exe`. The output will be similar to this:
+
+![Server running](/img/server-running.jpg)
+
+To check the local agent, navigate to <http://127.0.0.1:3000/>. The server will return some metadata:
+
+    {
+        "name": "Web Padlock",
+        "tokenid": "rEtgnDnKyktoegQhrcBTpNKcMFBKsepKqyNIGviF",
+        "version": {
+            "mayor": "1",
+            "minor": "0"
+        }
+    }
+
+Now visit the public demo server at <https://webpadlock.herokuapp.com/> and press the `Test me` button.
+
+The output will be **Device not allowed**, of course. Because
+
+    WARNING: Certificate/Host name mismatch.
+
+The example certificate does not match your hostname, ok. But the token claims are displayed anyways.
+
+If you want to dig deeper, you can run a local instance of the remote server, set your own CA and the appropiate certificate.
+
 ## Install and run
 
 Clone the repository. Install requirements listed in local/remote READMEs.
@@ -126,3 +161,9 @@ If all goes right a message like this will appear when you click test-me:
 If some of the validations fails, your device won't be allowed. Let's say you are using the certificate in another host:
 
 ![Login failed](/img/warnings.jpg)
+
+## Distribution
+
+To create a release from the python code use:
+
+    pyinstaller.exe --onefile .\server.py
