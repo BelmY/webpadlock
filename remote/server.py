@@ -41,9 +41,9 @@ def check():
         return ("Bad Request", 400)
     else:
         msg, status = webcheck(token)
-        html_message = "<p>"
-        html_message += "</p>\n<p>".join(msg)
-        html_message += "</p>\n"
+        html_message = ""
+        html_message += "<br>".join(msg)
+        html_message += "<br>"
         return html_message, status
 
 

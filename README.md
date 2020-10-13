@@ -38,13 +38,13 @@ Now visit the public demo server at <https://webpadlock.herokuapp.com/> and pres
 
 ![Login failed](/img/warnings.jpg)
 
-The output will be **Device not allowed**, of course. Because
+The output will be **Device not allowed**, of course. Because of
 
     WARNING: Certificate/Host name mismatch.
 
-The example certificate does not match your hostname, ok. But the token claims are displayed anyways.
+Fair enough, the example certificate does not match your hostname. But the token claims are displayed anyways.
 
-If you want to dig deeper, you can run a local instance of the remote server, set your own CA and the appropiate certificate.
+If you want to dig deeper, you can run a local instance of the remote server, setup your own CA and the appropiate certificate for your hosts.
 
 ## Description
 
