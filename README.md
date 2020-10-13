@@ -9,33 +9,9 @@ It has two parts:
 
 More about them below.
 
-## Description
-
-### Local service
-
-The key piece of this software is a x509 certificate, signed by some private CA and its key.
-
-Each device must have its own certificate. The CN must be equal to the hostname. Ideally, the key must not be exportable. You can use some sort of Management Software, system permissions or hardware TPM to prevent that.
-
-The local server creates a token with information about the host system, software metadata and all request parameters. The token is signed using the certificate's private key. And the certificate itself is added to the x5c header.
-
-Please see [Local README](/local/README.md) for a more detalied explanation.
-
-### Remote server
-
-The remote server validates the token signature using the device's x509 certificate present in the token itself.
-
-Then it ensures this certificate is valid and signed by our private CA. And the host name in the token claims matches with the CN.
-
-The remote acces control can use the verified token claims and make aditional validations. Like the request parameters on the signed token are the same from the request to prevent replay attacks. Check if the timing is short enought or wether the operating system is approved.
-
-In the demo server page the button named "test me" call a funcion that requests a token from the local server and send it back to the demo  server. Applies validations and writes an HTML message.
-
-For more information read [Remote README](/remote/README.md).
-
 ## Public demo
 
-If you only want to try this software, just download the [latest release](releases).
+If you only want to try this software, just download the [latest release](/electronicayciencia/webpadlock/releases).
 
 You will need:
 
@@ -60,6 +36,8 @@ To check the local agent, navigate to <http://127.0.0.1:3000/>. The server will 
 
 Now visit the public demo server at <https://webpadlock.herokuapp.com/> and press the `Test me` button.
 
+![Login failed](/img/warnings.jpg)
+
 The output will be **Device not allowed**, of course. Because
 
     WARNING: Certificate/Host name mismatch.
@@ -68,7 +46,31 @@ The example certificate does not match your hostname, ok. But the token claims a
 
 If you want to dig deeper, you can run a local instance of the remote server, set your own CA and the appropiate certificate.
 
-## Install and run
+## Description
+
+### Local service
+
+The key piece of this software is a x509 certificate, signed by some private CA and its key.
+
+Each device must have its own certificate. The CN must be equal to the hostname. Ideally, the key must not be exportable. You can use some sort of Management Software, system permissions or hardware TPM to prevent that.
+
+The local server creates a token with information about the host system, software metadata and all request parameters. The token is signed using the certificate's private key. And the certificate itself is added to the x5c header.
+
+Please see [Local README](/local/README.md) for a more detalied explanation.
+
+### Remote server
+
+The remote server validates the token signature using the device's x509 certificate present in the token itself.
+
+Then it ensures this certificate is valid and signed by our private CA. And the host name in the token claims matches with the CN.
+
+The remote acces control can use the verified token claims and make aditional validations. Like the request parameters on the signed token are the same from the request to prevent replay attacks. Check if the timing is short enought or wether the operating system is approved.
+
+In the demo server page the button named "test me" call a funcion that requests a token from the local server and send it back to the demo  server. Applies validations and writes an HTML message.
+
+For more information read [Remote README](/remote/README.md).
+
+## Local run
 
 Clone the repository. Install requirements listed in local/remote READMEs.
 
@@ -157,10 +159,6 @@ Run both local and remote servers. Open [http://127.0.0.1:10000/](http://127.0.0
 If all goes right a message like this will appear when you click test-me:
 
 ![Success](/img/success.jpg)
-
-If some of the validations fails, your device won't be allowed. Let's say you are using the certificate in another host:
-
-![Login failed](/img/warnings.jpg)
 
 ## Distribution
 
