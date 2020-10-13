@@ -11,7 +11,7 @@ More about them below.
 
 ## Public demo
 
-If you only want to try this software, just download the [latest release](/electronicayciencia/webpadlock/releases).
+If you only want to try this software, just download the [latest release](https://github.com/electronicayciencia/webpadlock/releases).
 
 You will need:
 
