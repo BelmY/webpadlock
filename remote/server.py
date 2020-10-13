@@ -123,7 +123,9 @@ def webcheck(token):
 
 if __name__ == '__main__':
 
-    config = get_config()
+    cfgfile = "config.json"
+
+    config = get_config(cfgfile)
     logging.basicConfig(level=config["log_level"])
 
     pem_ca_chain = []

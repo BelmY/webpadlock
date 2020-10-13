@@ -1,17 +1,21 @@
-def get_config():
-    """ Read configuration parameters"""
-    config = {}
-    config["cachain"] = ["intermediate.cert.pem", "ca.cert.pem"]
-    config["log_level"] = 10  # logging.DEBUG
-    config["http_port"] = 10000
-    config["listen_ip"] = "0.0.0.0"
-    config["session_secret"] = "webpadlock"
-    config["local_server_url"] = "http://127.0.0.1:3000/deviceinfo"
+import json
+import sys
 
-    return config
+
+def get_config(cfgfile):
+    """ Read configuration parameters"""
+    with open(cfgfile) as json_file:
+        data = json.load(json_file)
+    return data
 
 
 if __name__ == '__main__':
     import json
+
+    if len(sys.argv) < 2:
+        cfgfile = "../config.json"
+    else:
+        cfgfile = sys.argv[1]
+
     print("Configuration dict:")
-    print(json.dumps(get_config(), sort_keys=True, indent=4))
+    print(json.dumps(get_config(cfgfile), sort_keys=True, indent=4))

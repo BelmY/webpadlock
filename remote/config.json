@@ -1,0 +1,11 @@
+{
+    "cachain": [
+        "intermediate.cert.pem",
+        "ca.cert.pem"
+    ],
+    "http_port": 10000,
+    "listen_ip": "0.0.0.0",
+    "local_server_url": "http://127.0.0.1:3000/deviceinfo",
+    "log_level": 10,
+    "session_secret": "webpadlock"
+}

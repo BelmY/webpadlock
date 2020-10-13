@@ -9,6 +9,9 @@ from libs.utils import load_file
 from libs.jwtchecks import check_hostname, check_request_param
 
 
+cfgfile = "config.json"
+
+
 if len(sys.argv) < 2:
     print("Web Padlock. Command line interface for testing purposes.")
     print("Usage: {} tokenfile".format(sys.argv[0]))
@@ -23,7 +26,7 @@ except Exception as e:
     exit()
 
 
-config = get_config()
+config = get_config(cfgfile)
 logging.basicConfig(level=config["log_level"])
 
 pem_ca_chain = []
