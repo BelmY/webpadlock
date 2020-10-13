@@ -46,7 +46,9 @@ def deviceinfo():
 
 if __name__ == '__main__':
 
-    config = get_config()
+    cfgfile = "config.json"
+
+    config = get_config(cfgfile)
     logging.basicConfig(level=config["log_level"])
 
     key = load_private(config["private_key"])

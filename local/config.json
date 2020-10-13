@@ -1,0 +1,10 @@
+{
+    "allowed_requesters": [
+        "http://127.0.0.1:10000"
+    ],
+    "private_key": "workstation001.key.pem",
+    "certificate": "workstation001.cert.pem",
+    "http_port": 3000,
+    "listen_ip": "127.0.0.1",
+    "log_level": 10
+}

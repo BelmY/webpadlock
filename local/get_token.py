@@ -8,10 +8,12 @@ from libs.config import get_config
 from libs.metadata import get_metadata
 from libs.jwt import load_private, load_cert, create_jwt
 
+cfgfile = "config.json"
+
 
 def run():
     """Usage demo"""
-    config = get_config()
+    config = get_config(cfgfile)
 
     logging.basicConfig(level=config["log_level"])
 
