@@ -1,0 +1,4 @@
+jwcrypto==0.8
+Flask==1.1.2
+pyOpenSSL==19.1.0
+cryptography==3.1.1

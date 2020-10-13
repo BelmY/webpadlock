@@ -6,11 +6,7 @@ This should be running in the user workstation/laptop.
 
 Requirements:
 
-- jwcrypto
-- flask
-- flask-cors
-- platform
-- json
+    pip install -r requirements.txt
 
 ## API endpoints
 
