@@ -1,6 +1,7 @@
 # Requirements for the whole project
 
 # For the remote server in heroku
+gunicorn
 -r remote/requirements.txt
 
 # For the local agent (uncomment this to run a local agent)

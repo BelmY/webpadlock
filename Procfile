@@ -1,0 +1,1 @@
+web: gunicorn --chdir remote server:app

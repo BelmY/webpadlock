@@ -20,7 +20,6 @@ from libs.jwtchecks import check_hostname, check_request_param
 global config
 global pem_ca_chain
 
-
 app = Flask(__name__,
             static_url_path='',
             static_folder="web/static",
@@ -121,18 +120,19 @@ def webcheck(token):
     return msg, status
 
 
+cfgfile = "config.json"
+
+config = get_config(cfgfile)
+logging.basicConfig(level=config["log_level"])
+
+pem_ca_chain = []
+for cert in config["cachain"]:
+    pem_ca_chain.append(load_file(cert))
+logging.info("Loaded CA certificate chain.")
+
+app.secret_key = config["session_secret"]
+
+
 if __name__ == '__main__':
-
-    cfgfile = "config.json"
-
-    config = get_config(cfgfile)
-    logging.basicConfig(level=config["log_level"])
-
-    pem_ca_chain = []
-    for cert in config["cachain"]:
-        pem_ca_chain.append(load_file(cert))
-    logging.info("Loaded CA certificate chain.")
-
-    app.secret_key = config["session_secret"]
     app.run(host=config["listen_ip"],
             port=config["http_port"])

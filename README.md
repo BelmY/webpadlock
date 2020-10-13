@@ -35,7 +35,7 @@ For more information read [Remote README](/remote/README.md).
 
 ## Install and run
 
-Clone the repository.
+Clone the repository. Install requirements listed in local/remote READMEs.
 
 ### Local server
 
