@@ -17,6 +17,7 @@ if len(sys.argv) < 2:
 
 try:
     testtoken = load_file(sys.argv[1])
+    print(testtoken)
 except Exception as e:
     logging.fatal("Error reading token: {}".format(e))
     exit()
@@ -25,7 +26,9 @@ except Exception as e:
 config = get_config()
 logging.basicConfig(level=config["log_level"])
 
-pemcacert = load_file(config["cacert"])
+pem_ca_chain = []
+for cert in config["cachain"]:
+    pem_ca_chain.append(load_file(cert))
 
 
 # Check token signature
@@ -42,7 +45,7 @@ except Exception as e:
 
 # Check certificate chain
 try:
-    verify_pem_chain(pemchain, pemcacert)
+    verify_pem_chain(pemchain, pem_ca_chain)
     logging.info("Certificate verification OK")
 except Exception as e:
     logging.warning("Certificate verification failed: {}".format(e))

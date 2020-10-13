@@ -74,6 +74,5 @@ Example:
 - document config options
 - web server origin domains filter
 - daemonize
-- certificate chain
 - check key permissions
 - integration with hardware TPM

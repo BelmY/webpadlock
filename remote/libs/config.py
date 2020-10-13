@@ -1,7 +1,7 @@
 def get_config():
     """ Read configuration parameters"""
     config = {}
-    config["cacert"] = "workstation001-cert.pem"
+    config["cachain"] = ["intermediate.cert.pem", "ca.cert.pem"]
     config["log_level"] = 10  # logging.DEBUG
     config["http_port"] = 10000
     config["listen_ip"] = "0.0.0.0"

@@ -9,19 +9,9 @@ Requirements:
 - pyopenssl
 - flask
 
-cacert = workstation001 (self signed)
+## Todo
 
-checks:
-
-- included cert validity
-- cert chain until cacert
-- cert chain not revoked
-- token signature with included cert
-- request parameters (nonce)
-- cert cn vs system hostname
-- system information parameters
-
-Todo:
-
+- improve documentation
 - https
-- separate files
+- json api
+- better looking website

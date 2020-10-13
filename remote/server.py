@@ -18,7 +18,7 @@ from libs.crypto import verify_pem_chain, validate_token
 from libs.jwtchecks import check_hostname, check_request_param
 
 global config
-global pemcacert
+global pem_ca_chain
 
 
 app = Flask(__name__,
@@ -72,7 +72,7 @@ def webcheck(token):
 
     # Check certificate chain
     try:
-        verify_pem_chain(pemchain, pemcacert)
+        verify_pem_chain(pemchain, pem_ca_chain)
         msg.append("INFO: Certificate verification OK")
     except Exception as e:
         msg.append("WARNING: Certificate verification failed: {}".format(e))
@@ -126,8 +126,10 @@ if __name__ == '__main__':
     config = get_config()
     logging.basicConfig(level=config["log_level"])
 
-    pemcacert = load_file(config["cacert"])
-    logging.info("Loaded CA certificate from {}.".format(config["cacert"]))
+    pem_ca_chain = []
+    for cert in config["cachain"]:
+        pem_ca_chain.append(load_file(cert))
+    logging.info("Loaded CA certificate chain.")
 
     app.secret_key = config["session_secret"]
     app.run(host=config["listen_ip"],

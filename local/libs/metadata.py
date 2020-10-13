@@ -15,7 +15,7 @@ def get_metadata():
     info["version"]["mayor"] = "1"
     info["version"]["minor"] = "0"
     info["name"] = "Web Padlock"
-    info["response-id"] = get_random_string(40)
+    info["tokenid"] = get_random_string(40)
 
     return info
 

@@ -40,14 +40,17 @@ def validate_token(jwt_str):
     return pemchain, json.loads(token.claims)
 
 
-def verify_certificate_using_other(pem_incognito, pem_trusted):
-    """ Verify one certificate in the context of another trusted. 
+def verify_certificate_in_context(pem_incognito, pem_trusted_chain):
+    """ Verify one certificate in the context of a trsuted chain. 
+    pem_incognito: untrusted certificate in pem format
+    pem_trusted_chain: array of trusted certificates in pem format
     Return true if Ok, Exception in failure """
     store = crypto.X509Store()
 
-    # Add trusted cert
-    trusted = crypto.load_certificate(crypto.FILETYPE_PEM, pem_trusted)
-    store.add_cert(trusted)
+    # Add trusted cert chain
+    for cert in pem_trusted_chain:
+        trusted = crypto.load_certificate(crypto.FILETYPE_PEM, cert)
+        store.add_cert(trusted)
 
     # Add incognito cert to context
     incognito = crypto.load_certificate(crypto.FILETYPE_PEM, pem_incognito)
@@ -57,8 +60,8 @@ def verify_certificate_using_other(pem_incognito, pem_trusted):
     return True
 
 
-def verify_pem_chain(pemchain, pemca):
+def verify_pem_chain(pemchain, pemcachain):
     """ Verify the certificate chain. 
     NOTE: Only two at the moment. 
     Return true if Ok, Exception in failure. """
-    return verify_certificate_using_other(pemchain[0], pemca)
+    return verify_certificate_in_context(pemchain[0], pemcachain)
