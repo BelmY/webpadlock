@@ -8,11 +8,61 @@ Requirements:
 
 ## Run
 
+### Server
+
     python server.py
+
+### check_token.py
+
+Validate a saved token.
+
+    $ python check_token.py testtoken.dat
+    eyhb...eFhjygH
+    INFO:root:Decoding token ok
+    INFO:root:Certificate verification OK
+    INFO:root:System hostname matches certificate CN.
+    Certificate data:
+    {
+        "cn": "workstation001",
+        "issuer": "CN=CA Pruebas Intermediate,O=CA Pruebas,ST=Madrid,C=ES",
+        "not_valid_after": "2021-10-23T09:21:30",
+        "not_valid_before": "2020-10-13T09:21:30",
+        "subject": "CN=workstation001,O=WebPadlock,C=ES"
+    }
+
+    Token claims:
+    {
+        "iat": 1602584381,
+        "metadata": {
+            "name": "Web Padlock",
+            "tokenid": "rCVUaGCubecBGIJfyRZRveGJvoBUSyRnUUUPQKOM",
+            "version": {
+                "mayor": "1",
+                "minor": "0"
+            }
+        },
+        "requestdata": {
+            "requestId": "f01253ff497eae7fa1555c34a822c2498835c58b"
+        },
+        "systeminfo": {
+            "hostname": "workstation001",
+            "osname": "Windows",
+            "osrelease": "8.1",
+            "osversion": "6.3.9600",
+            "user": "Reinoso"
+        }
+    }
+
+## Server endpoints
+
+/
+
+/check
+
+/jsoncheck
 
 ## Todo
 
 - improve documentation
 - https
-- json api
 - better looking website

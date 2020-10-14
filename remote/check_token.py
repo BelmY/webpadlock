@@ -3,10 +3,10 @@ import json
 import logging
 from jwcrypto import jws
 
-from libs.crypto import verify_pem_chain, validate_token
+from libs.crypto import verify_pem_chain, validate_token, get_cert_data
 from libs.config import get_config
 from libs.utils import load_file
-from libs.jwtchecks import check_hostname, check_request_param
+from libs.jwtchecks import check_request_param
 
 
 cfgfile = "config.json"
@@ -56,7 +56,8 @@ except Exception as e:
 
 # Check hostname
 try:
-    if check_hostname(pemchain, claims):
+    certdata = get_cert_data(pemchain[0])
+    if certdata["cn"] == claims["systeminfo"]["hostname"]:
         logging.info("System hostname matches certificate CN.")
     else:
         logging.warning("Certificate/Host name mismatch.")
@@ -65,5 +66,8 @@ except Exception:
     logging.error("Error matching hostname.")
 
 
-print("Token claims: ")
+print("Certificate data:")
+print(json.dumps(certdata, sort_keys=True, indent=4))
+print("")
+print("Token claims:")
 print(json.dumps(claims, sort_keys=True, indent=4))

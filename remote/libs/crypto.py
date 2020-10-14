@@ -2,6 +2,23 @@ import json
 import logging
 from OpenSSL import crypto
 from jwcrypto import jwt, jwk, jws
+from cryptography import x509
+from cryptography.x509.oid import NameOID
+
+
+def get_cert_data(pem_data):
+    """ 
+    Return certificate data strings form given pem_data.
+    """
+    data = {}
+    cert = x509.load_pem_x509_certificate(pem_data)
+    data["issuer"] = cert.issuer.rfc4514_string()
+    data["subject"] = cert.subject.rfc4514_string()
+    data["not_valid_after"] = cert.not_valid_after.isoformat()
+    data["not_valid_before"] = cert.not_valid_before.isoformat()
+    data["cn"] = cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)[
+        0].value
+    return data
 
 
 def jwt_pemchain(token):

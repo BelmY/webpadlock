@@ -14,8 +14,7 @@ from jwcrypto import jws
 from libs.config import get_config
 from libs.randomstr import get_random_string
 from libs.utils import load_file
-from libs.crypto import verify_pem_chain, validate_token
-from libs.jwtchecks import check_hostname, check_request_param
+from libs.crypto import verify_pem_chain, validate_token, get_cert_data
 
 global config
 global pem_ca_chain
@@ -45,6 +44,70 @@ def check():
         html_message += "<br>".join(msg)
         html_message += "<br>"
         return html_message, status
+
+
+@app.route('/jsoncheck')
+def jsoncheck_wrap():
+    token = request.args.get("token")
+    if (token is None):
+        return ("Bad Request", 400)
+    else:
+        return jsoncheck(token)
+
+
+def jsoncheck(token):
+    """
+    Validate a token and compose a response in JSON format.
+    Always return 200.
+    """
+
+    response = {
+        "token": {
+            "validation": None,
+            "claims": None
+        },
+        "x509": {
+            "validation": None,
+            "data": None
+        }
+    }
+
+    # Check token signature
+    try:
+        pemchain, claims = validate_token(token)
+        response["token"]["claims"] = claims
+        response["token"]["validation"] = {
+            "error": 0,
+            "message": "Signature is valid"
+        }
+    except jws.InvalidJWSSignature:
+        response["token"]["validation"] = {
+            "error": 1,
+            "message": "Invalid signature"
+        }
+        return json.dumps(response), 200
+    except Exception as e:
+        response["token"]["validation"] = {
+            "error": 2,
+            "message": "Decoding error: {}".format(e)
+        }
+        return json.dumps(response), 200
+
+    # Check certificate chain
+    try:
+        verify_pem_chain(pemchain, pem_ca_chain)
+        response["x509"]["data"] = get_cert_data(pemchain[0])
+        response["x509"]["validation"] = {
+            "error": 0,
+            "message": "Valid x509 certificate"
+        }
+    except Exception as e:
+        response["x509"]["validation"] = {
+            "error": 1,
+            "message": "Certificate chain verification failed: {}".format(e)
+        }
+
+    return json.dumps(response), 200
 
 
 def webcheck(token):
@@ -77,9 +140,15 @@ def webcheck(token):
         msg.append("WARNING: Certificate verification failed: {}".format(e))
         status = 401
 
+    certdata = get_cert_data(pemchain[0])
+    msg.append("INFO: Signing certificate data is:")
+    msg.append("<pre>"+json.dumps(certdata, sort_keys=True, indent=4)+"</pre>")
+
     # Check hostname
     try:
-        if check_hostname(pemchain, claims):
+        certdata = get_cert_data(pemchain[0])
+
+        if certdata["cn"] == claims["systeminfo"]["hostname"]:
             msg.append("INFO: System hostname matches certificate CN.")
         else:
             msg.append("WARNING: Certificate/Host name mismatch.")
