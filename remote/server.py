@@ -24,6 +24,20 @@ app = Flask(__name__,
             template_folder="web/templates")
 
 
+@app.route('/check')
+def check():
+    token = request.args.get("token")
+    if (token is None):
+        return ("Bad Request", 400)
+    else:
+        token_info = process_token(token, pem_ca_chain)
+        return json.dumps(token_info), 200
+
+# -------------
+# Demo pages. Do not use them in production.
+# -------------
+
+
 @app.route('/')
 def home():
     session['requestId'] = get_random_string(20)
@@ -32,34 +46,51 @@ def home():
                            local_server_url=config["local_server_url"])
 
 
-@app.route('/check')
-def check():
+@app.route('/democheck')
+def democheck():
     token = request.args.get("token")
     if (token is None):
         return ("Bad Request", 400)
     else:
         msg, status = webcheck(token)
-        html_message = ""
+
+        fmt_msg = []
         for htmlclass, message in msg:
+            fmt_msg.append(
+                "<div class='alert alert-{}'>{}</div>".format(htmlclass, message))
+
+        html_message = """
+        <div class="row">
+            <div class="col-sm">{}</div>
+            <div class="col-sm">{}</div>
+        </div>
+        """.format(fmt_msg[0], fmt_msg[1])
+
+        html_message += """
+        <div class="row">
+            <div class="col-sm">{}</div>
+            <div class="col-sm">{}</div>
+        </div>
+        """.format(fmt_msg[2], fmt_msg[3])
+
+        html_message += """
+        <div class="row">
+            <div class="col-sm">{}</div>
+            <div class="col-sm">{}</div>
+        </div>
+        """.format(fmt_msg[4], fmt_msg[5])
+
+        for htmlclass, message in msg[6:]:
             html_message += "<div class='alert alert-{}'>{}</div>".format(
                 htmlclass, message)
         return html_message, status
 
 
-@app.route('/jsoncheck')
-def jsoncheck():
-    token = request.args.get("token")
-    if (token is None):
-        return ("Bad Request", 400)
-    else:
-        token_info = process_token(token, pem_ca_chain)
-        return json.dumps(token_info), 200
-
-
 def webcheck(token):
     """
     Compose a status message after the received token.
-    This is only an example.
+    This is just an example. The HTML formatting here is nasty.
+    You must always use the json api.
     """
 
     msg = []

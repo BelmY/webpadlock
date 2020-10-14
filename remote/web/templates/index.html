@@ -11,8 +11,8 @@
         var localServerUrl = "{{ local_server_url }}"
     </script>
 
-    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
 </head>
 
 
@@ -20,7 +20,12 @@
     <div class="container bg-light">
         <div class="jumbotron">
             <h1 class="display-4">Web Padlock demo page</h1>
-            <p class="lead">Please hit <em>test me</em> button.</p>
+            <p class="lead">You can login only from a <em>corporate</em> device. Visit
+                <a href="https://github.com/electronicayciencia/webpadlock" target="_blank">
+                    GitHub repository</a> for more information.
+            </p>
+            <hr class="my-4">
+            <p>Please hit <em>test me</em> button.</p>
             <button class="btn btn-primary btn-lg" id="testme_button">Test me</button>
         </div>
 

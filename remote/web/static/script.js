@@ -33,10 +33,10 @@ function fillStatusDiv(
     div = document.getElementById('status_div');
 
     div.innerHTML = `
-            <div class="statusMsg ${cssclass}">
+            <div class="statusMsg ${cssclass} strong">
                 ${status}
             </div>
-            <div class="causeMsg">
+            <div class="container causeMsg">
                 ${message}
             </div>
         `;
@@ -70,7 +70,7 @@ function processToken(token) {
     console.log("Web Padlock device info token:\n" + token);
     fillStatusDiv("Processing token...")
 
-    var url = "/check?token=" + token;
+    var url = "/democheck?token=" + token;
 
     var req = new XMLHttpRequest();
     req.open("GET", url, true);
