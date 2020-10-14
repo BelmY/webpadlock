@@ -1,5 +1,5 @@
 from jwcrypto import jws
-from libs.crypto import verify_pem_chain, validate_token, get_cert_data
+from .crypto import verify_pem_chain, validate_token, get_cert_data
 
 # Here you can add all the additional checks you need, based on token.
 
