@@ -2,11 +2,25 @@
 
 This should be running in the user workstation/laptop.
 
-## Install
+## Run this local agent
 
-Requirements:
+### From binary
+
+Go to [latest release](https://github.com/electronicayciencia/webpadlock/releases) and download these files:
+
+- **server.exe**: local agent.
+- **config.json**: configuration file
+- **workstation001.key.pem** and **workstation001.key.pem** example host certificates.
+
+Put all of them in the same folder and run `server.exe`.
+
+### From source
+
+Install requirements:
 
     pip install -r requirements.txt
+
+Run `server.py`.
 
 ## API endpoints
 
@@ -66,9 +80,7 @@ Example:
 
 ## TODO
 
-- configuration file
 - document config options
-- web server origin domains filter
 - daemonize
 - check key permissions
 - integration with hardware TPM
