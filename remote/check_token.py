@@ -3,11 +3,9 @@ import json
 import logging
 from jwcrypto import jws
 
-from libs.crypto import verify_pem_chain, validate_token, get_cert_data
 from libs.config import get_config
 from libs.utils import load_file
-from libs.jwtchecks import check_request_param
-
+from libs.jwtchecks import process_token
 
 cfgfile = "config.json"
 
@@ -33,41 +31,31 @@ pem_ca_chain = []
 for cert in config["cachain"]:
     pem_ca_chain.append(load_file(cert))
 
+token_info = process_token(testtoken, pem_ca_chain)
 
 # Check token signature
-try:
-    pemchain, claims = validate_token(testtoken)
-    logging.info("Decoding token ok")
-except (jws.InvalidJWSSignature) as e:
-    logging.fatal("Token signature verification failed.")
-    exit()
-except Exception as e:
-    logging.fatal("Decoding token failed: {}".format(e))
-    exit()
+if token_info["token"]["validation"]["error"] == 0:
+    logging.info(token_info["token"]["validation"]["message"])
+else:
+    logging.critical(token_info["token"]["validation"]["message"])
 
+print("")
+print("Certificate data:")
+print(json.dumps(token_info["x509"]["data"], sort_keys=True, indent=4))
 
 # Check certificate chain
-try:
-    verify_pem_chain(pemchain, pem_ca_chain)
-    logging.info("Certificate verification OK")
-except Exception as e:
-    logging.warning("Certificate verification failed: {}".format(e))
+if token_info["x509"]["validation"]["error"] == 0:
+    logging.info(token_info["x509"]["validation"]["message"])
+else:
+    logging.warning(token_info["x509"]["validation"]["message"])
 
 
-# Check hostname
-try:
-    certdata = get_cert_data(pemchain[0])
-    if certdata["cn"] == claims["systeminfo"]["hostname"]:
-        logging.info("System hostname matches certificate CN.")
-    else:
-        logging.warning("Certificate/Host name mismatch.")
-
-except Exception:
-    logging.error("Error matching hostname.")
+if token_info["x509"]["data"]["cn"] == token_info["token"]["claims"]["systeminfo"]["hostname"]:
+    logging.info("System hostname matches certificate CN.")
+else:
+    logging.warning("Certificate/Host name mismatch.")
 
 
-print("Certificate data:")
-print(json.dumps(certdata, sort_keys=True, indent=4))
 print("")
 print("Token claims:")
-print(json.dumps(claims, sort_keys=True, indent=4))
+print(json.dumps(token_info["token"]["claims"], sort_keys=True, indent=4))

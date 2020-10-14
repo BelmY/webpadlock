@@ -9,12 +9,11 @@ import json
 import time
 import logging
 from flask import Flask, request, render_template, session
-from jwcrypto import jws
 
 from libs.config import get_config
 from libs.randomstr import get_random_string
 from libs.utils import load_file
-from libs.crypto import verify_pem_chain, validate_token, get_cert_data
+from libs.jwtchecks import process_token
 
 global config
 global pem_ca_chain
@@ -47,120 +46,68 @@ def check():
 
 
 @app.route('/jsoncheck')
-def jsoncheck_wrap():
+def jsoncheck():
     token = request.args.get("token")
     if (token is None):
         return ("Bad Request", 400)
     else:
-        return jsoncheck(token)
-
-
-def jsoncheck(token):
-    """
-    Validate a token and compose a response in JSON format.
-    Always return 200.
-    """
-
-    response = {
-        "token": {
-            "validation": None,
-            "claims": None
-        },
-        "x509": {
-            "validation": None,
-            "data": None
-        }
-    }
-
-    # Check token signature
-    try:
-        pemchain, claims = validate_token(token)
-        response["token"]["claims"] = claims
-        response["token"]["validation"] = {
-            "error": 0,
-            "message": "Signature is valid"
-        }
-    except jws.InvalidJWSSignature:
-        response["token"]["validation"] = {
-            "error": 1,
-            "message": "Invalid signature"
-        }
-        return json.dumps(response), 200
-    except Exception as e:
-        response["token"]["validation"] = {
-            "error": 2,
-            "message": "Decoding error: {}".format(e)
-        }
-        return json.dumps(response), 200
-
-    # Check certificate chain
-    try:
-        verify_pem_chain(pemchain, pem_ca_chain)
-        response["x509"]["data"] = get_cert_data(pemchain[0])
-        response["x509"]["validation"] = {
-            "error": 0,
-            "message": "Valid x509 certificate"
-        }
-    except Exception as e:
-        response["x509"]["validation"] = {
-            "error": 1,
-            "message": "Certificate chain verification failed: {}".format(e)
-        }
-
-    return json.dumps(response), 200
+        token_info = process_token(token, pem_ca_chain)
+        return json.dumps(token_info), 200
 
 
 def webcheck(token):
     """
     Compose a status message after the received token.
-    This is only an example. Your actual check routine will be different.
+    This is only an example.
     """
+
     msg = []
     status = 200
 
+    token_info = process_token(token, pem_ca_chain)
+
     # Check token signature
-    try:
-        pemchain, claims = validate_token(token)
-        msg.append("INFO: Token integrity OK")
-    except (jws.InvalidJWSSignature) as e:
-        msg.append("FATAL: Token signature verification failed.")
-        return msg, 401
-    except Exception as e:
-        msg.append("FATAL: Decoding token failed: {}\n".format(e))
+    if token_info["token"]["validation"]["error"] == 0:
+        msg.append("INFO: " + token_info["token"]["validation"]["message"])
+    else:
+        msg.append("CRITICAL" + token_info["token"]["validation"]["message"])
         return msg, 401
 
     msg.append("INFO: Token succesfully decoded. Claims are:")
-    msg.append("<pre>"+json.dumps(claims, sort_keys=True, indent=4)+"</pre>")
+    msg.append("<pre>" +
+               json.dumps(
+                   token_info["token"]["claims"],
+                   sort_keys=True,
+                   indent=4) +
+               "</pre>"
+               )
+
+    msg.append("INFO: Signing certificate data:")
+    msg.append("<pre>" +
+               json.dumps(
+                   token_info["x509"]["data"],
+                   sort_keys=True,
+                   indent=4) +
+               "</pre>"
+               )
 
     # Check certificate chain
-    try:
-        verify_pem_chain(pemchain, pem_ca_chain)
-        msg.append("INFO: Certificate verification OK")
-    except Exception as e:
-        msg.append("WARNING: Certificate verification failed: {}".format(e))
+    if token_info["x509"]["validation"]["error"] == 0:
+        msg.append("INFO: " + token_info["x509"]["validation"]["message"])
+    else:
+        msg.append("WARNING: " + token_info["x509"]["validation"]["message"])
         status = 401
 
-    certdata = get_cert_data(pemchain[0])
-    msg.append("INFO: Signing certificate data is:")
-    msg.append("<pre>"+json.dumps(certdata, sort_keys=True, indent=4)+"</pre>")
-
-    # Check hostname
-    try:
-        certdata = get_cert_data(pemchain[0])
-
-        if certdata["cn"] == claims["systeminfo"]["hostname"]:
-            msg.append("INFO: System hostname matches certificate CN.")
-        else:
-            msg.append("WARNING: Certificate/Host name mismatch.")
-            status = 401
-
-    except Exception:
-        msg.append("ERROR: Error matching hostname.")
+    # Check CN
+    if token_info["x509"]["data"]["cn"] == token_info["token"]["claims"]["systeminfo"]["hostname"]:
+        msg.append("INFO: System hostname matches certificate CN.")
+    else:
+        msg.append("WARNING: Certificate/Host name mismatch.")
         status = 401
 
     # Check that this response is for my last request
     try:
-        if claims["requestdata"]["requestId"] == session["requestId"]:
+        if token_info["token"]["claims"]["requestdata"]["requestId"] == session["requestId"]:
             msg.append("INFO: Token is for the expected request.")
         else:
             msg.append("WARNING: Token is for another request.")
@@ -173,22 +120,26 @@ def webcheck(token):
     # Check that this token is issued in the next 10 seconds of the request
     # Not match the device time, because it could be off-time.
     # Use the request session timeof instead.
-        # Check that this response is for my last request
-    # Check that this response is for my last request
-    try:
-        if int(time.time()) - session["timeof"] < 10:
-            msg.append("INFO: Token is on-time.")
-        else:
-            msg.append("WARNING: Token wait expired, reload the page.")
-            status = 401
 
-    except Exception:
-        msg.append("ERROR: Token format unknown.")
+    if int(time.time()) - session["timeof"] < 10:
+        msg.append("INFO: Token is on-time.")
+    else:
+        msg.append("WARNING: Token wait expired, reload the page.")
         status = 401
+
+    msg.append("DEBUG: JSON API response:")
+    msg.append("<pre>" +
+               json.dumps(
+                   token_info,
+                   sort_keys=True,
+                   indent=4) +
+               "</pre>"
+               )
 
     return msg, status
 
 
+# Initialization for wsgi and standalone:
 cfgfile = "config.json"
 
 config = get_config(cfgfile)
