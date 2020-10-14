@@ -28,19 +28,17 @@ function sendRequest() {
 function fillStatusDiv(
     status = "",
     message = "",
-    cssclass = "info") {
+    cssclass = "alert alert-info") {
 
     div = document.getElementById('status_div');
 
     div.innerHTML = `
-        <div class="result ${cssclass}">
-            <div class="statusMsg">
-                <p>${status}</p>
+            <div class="statusMsg ${cssclass}">
+                ${status}
             </div>
             <div class="causeMsg">
                 ${message}
             </div>
-        </div>
         `;
 }
 
@@ -64,7 +62,7 @@ function errorRetrievingToken(status) {
             causeMsg = "Error " + status;
     }
 
-    fillStatusDiv(statusMsg, causeMsg, "error")
+    fillStatusDiv(statusMsg, causeMsg, "alert alert-danger")
 }
 
 
@@ -96,16 +94,16 @@ function errorProcessingToken(status, msg) {
     switch (status) {
         case 401:
             fillStatusDiv(
-                "Device not allowed",
+                "Device not allowed. Why?",
                 msg,
-                "warning"
+                "alert alert-warning"
             );
             break;
         default:
             fillStatusDiv(
                 "Error processing your token",
                 "HTTP status code: " + status,
-                "error"
+                "alert alert-danger"
             );
     }
 }
@@ -113,9 +111,9 @@ function errorProcessingToken(status, msg) {
 
 function processTokenResult(msg) {
     fillStatusDiv(
-        "Great! Now you can log-in",
+        "Great! Now you can log-in!",
         msg,
-        "success"
+        "alert alert-success"
     );
 }
 

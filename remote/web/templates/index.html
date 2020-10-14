@@ -17,13 +17,15 @@
 
 
 <body>
-    <main class="container">
-        <h1>Web Padlock demo page</h1>
-        <p>Please hit <em>test me</em> button.</p>
-        <button id="testme_button">Test me</button>
+    <div class="container bg-light">
+        <div class="jumbotron">
+            <h1 class="display-4">Web Padlock demo page</h1>
+            <p class="lead">Please hit <em>test me</em> button.</p>
+            <button class="btn btn-primary btn-lg" id="testme_button">Test me</button>
+        </div>
 
         <div id="status_div"></div>
-    </main>
+    </div>
 
     <script type="text/javascript" src="{{ url_for('static', filename='script.js') }}"></script>
 

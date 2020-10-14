@@ -40,8 +40,9 @@ def check():
     else:
         msg, status = webcheck(token)
         html_message = ""
-        html_message += "<br>".join(msg)
-        html_message += "<br>"
+        for htmlclass, message in msg:
+            html_message += "<div class='alert alert-{}'>{}</div>".format(
+                htmlclass, message)
         return html_message, status
 
 
@@ -68,53 +69,37 @@ def webcheck(token):
 
     # Check token signature
     if token_info["token"]["validation"]["error"] == 0:
-        msg.append("INFO: " + token_info["token"]["validation"]["message"])
+        msg.append(["SUCCESS", token_info["token"]["validation"]["message"]])
     else:
-        msg.append("CRITICAL" + token_info["token"]["validation"]["message"])
+        msg.append(["DANGER", token_info["token"]["validation"]["message"]])
         return msg, 401
 
-    msg.append("INFO: Token succesfully decoded. Claims are:")
-    msg.append("<pre>" +
-               json.dumps(
-                   token_info["token"]["claims"],
-                   sort_keys=True,
-                   indent=4) +
-               "</pre>"
-               )
-
-    msg.append("INFO: Signing certificate data:")
-    msg.append("<pre>" +
-               json.dumps(
-                   token_info["x509"]["data"],
-                   sort_keys=True,
-                   indent=4) +
-               "</pre>"
-               )
+    msg.append(["SUCCESS", "Token succesfully decoded."])
 
     # Check certificate chain
     if token_info["x509"]["validation"]["error"] == 0:
-        msg.append("INFO: " + token_info["x509"]["validation"]["message"])
+        msg.append(["SUCCESS", token_info["x509"]["validation"]["message"]])
     else:
-        msg.append("WARNING: " + token_info["x509"]["validation"]["message"])
+        msg.append(["DANGER", token_info["x509"]["validation"]["message"]])
         status = 401
 
     # Check CN
     if token_info["x509"]["data"]["cn"] == token_info["token"]["claims"]["systeminfo"]["hostname"]:
-        msg.append("INFO: System hostname matches certificate CN.")
+        msg.append(["SUCCESS", "System hostname matches certificate CN."])
     else:
-        msg.append("WARNING: Certificate/Host name mismatch.")
+        msg.append(["DANGER", "Certificate/Host name mismatch."])
         status = 401
 
     # Check that this response is for my last request
     try:
         if token_info["token"]["claims"]["requestdata"]["requestId"] == session["requestId"]:
-            msg.append("INFO: Token is for the expected request.")
+            msg.append(["SUCCESS", "Token is for the expected request."])
         else:
-            msg.append("WARNING: Token is for another request.")
+            msg.append(["DANGER", "Token is for another request."])
             status = 401
 
     except Exception:
-        msg.append("ERROR: Token format unknown.")
+        msg.append(["DANGER", "Token format unknown."])
         status = 401
 
     # Check that this token is issued in the next 10 seconds of the request
@@ -122,19 +107,31 @@ def webcheck(token):
     # Use the request session timeof instead.
 
     if int(time.time()) - session["timeof"] < 10:
-        msg.append("INFO: Token is on-time.")
+        msg.append(["SUCCESS", "Token is on-time."])
     else:
-        msg.append("WARNING: Token wait expired, reload the page.")
+        msg.append(["WARNING", "Token wait expired, reload the page."])
         status = 401
 
-    msg.append("DEBUG: JSON API response:")
-    msg.append("<pre>" +
-               json.dumps(
-                   token_info,
-                   sort_keys=True,
-                   indent=4) +
-               "</pre>"
-               )
+    msg.append(["INFO", "Token claims are: <pre>" +
+                json.dumps(
+                    token_info["token"]["claims"],
+                    sort_keys=True,
+                    indent=4) +
+                "</pre>"])
+
+    msg.append(["INFO", "Signing certificate data: <pre>" +
+                json.dumps(
+                    token_info["x509"]["data"],
+                    sort_keys=True,
+                    indent=4) +
+                "</pre>"])
+
+    msg.append(["LIGHT", "Raw JSON API response (for DEBUG): <pre>" +
+                json.dumps(
+                    token_info,
+                    sort_keys=True,
+                    indent=4) +
+                "</pre>"])
 
     return msg, status
 
