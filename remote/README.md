@@ -12,11 +12,19 @@ Requirements:
 
 ### Server
 
+To start the server run
+
     python server.py
+
+Or, as a WSGI application,
+
+    gunicorn server:app
+
+Don't forget to setup https in the server.
 
 ### check_token.py
 
-Validate a saved token.
+CLI command to validate a saved token.
 
     $ python check_token.py testtoken.dat
     eyhb...eFhjygH
@@ -72,7 +80,7 @@ And `signature` is a SHA1-HMAC function of the data above. The key is in configu
 
 You should call this endpoint just before request a token from the local agent. And don't forget include this variables in the request:
 
-   http://127.0.0.1:3000/deviceinfo?nonce=...&server_time=...&signature=...
+    http://127.0.0.1:3000/deviceinfo?nonce=...&server_time=...&signature=...
 
 ### GET /check?token=
 
@@ -91,7 +99,6 @@ For example:
 - check the certificate is valid (x509.validation.error = 0)
 - check if the host name in system information matches the signing certificate's cn field. To prevent illegal copy of certificates
 - check if the session elapsed time is less than 3 seconds. It makes impractical to retrieve a token from a compromised remote laptop.
-
 
 The returned object is:
 
@@ -153,3 +160,28 @@ Demo server's home page
 ### GET /democheck?token=
 
 Return a formated html message for the demo service.
+
+## Configuration file
+
+Example:
+
+    {
+        "cachain": [
+            "intermediate.cert.pem",
+            "ca.cert.pem"
+        ],
+        "http_port": 10000,
+        "listen_ip": "0.0.0.0",
+        "local_server_url": "http://127.0.0.1:3000/deviceinfo",
+        "log_level": 10,
+        "session_secret": "webpadlock"
+    }
+
+Parameters:
+
+- cachain: array with all trusted certificates.
+- local_server_url: url to ask for a local token in enrolled devices.
+- log_level: log level (see python logging package levels)
+- session_secret: key to calculate the stateless sessions
+- http_port: listening port (for stand-alone server)
+- listen_ip: binding interface (for stand-alone server)
