@@ -1,5 +1,7 @@
 # Remote server part
 
+You should remove the server demo endpoints before use it in production. **Only use the JSON API.**
+
 ## Install
 
 Requirements:
@@ -53,7 +55,7 @@ Validate a saved token.
         }
     }
 
-## Server endpoints
+## Server API JSON
 
 ### GET /start_auth
 
@@ -72,10 +74,24 @@ You should call this endpoint just before request a token from the local agent. 
 
    http://127.0.0.1:3000/deviceinfo?nonce=...&server_time=...&signature=...
 
-
 ### GET /check?token=
 
-Return a JSON object with basic validations. You can then add others validations you want.
+Return a JSON object with basic validations:
+
+- token format
+- token signature
+- signing certificate
+- session data
+
+Then you can use this information to permit of deny access.
+
+For example:
+
+- check the signature is valid (token.validation.error = 0)
+- check the certificate is valid (x509.validation.error = 0)
+- check if the host name in system information matches the signing certificate's cn field. To prevent illegal copy of certificates
+- check if the session elapsed time is less than 3 seconds. It makes impractical to retrieve a token from a compromised remote laptop.
+
 
 The returned object is:
 
@@ -128,6 +144,8 @@ The returned object is:
         }
     }
 
+## Server demo pages
+
 ### GET /
 
 Demo server's home page
@@ -135,7 +153,3 @@ Demo server's home page
 ### GET /democheck?token=
 
 Return a formated html message for the demo service.
-
-## Todo
-
-- improve documentation
