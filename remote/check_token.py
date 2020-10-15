@@ -6,6 +6,7 @@ from jwcrypto import jws
 from libs.config import get_config
 from libs.utils import load_file
 from libs.jwtchecks import process_token
+from libs.stateless import check_auth_session
 
 cfgfile = "config.json"
 
@@ -31,7 +32,7 @@ pem_ca_chain = []
 for cert in config["cachain"]:
     pem_ca_chain.append(load_file(cert))
 
-token_info = process_token(testtoken, pem_ca_chain)
+token_info = process_token(testtoken, pem_ca_chain, config["session_secret"])
 
 # Check token signature
 if token_info["token"]["validation"]["error"] == 0:
@@ -55,6 +56,13 @@ if token_info["x509"]["data"]["cn"] == token_info["token"]["claims"]["systeminfo
 else:
     logging.warning("Certificate/Host name mismatch.")
 
+# Check session data
+    # Check auth session age (10 seconds max)
+    if token_info["session"]["present"]:
+        logging.info(
+            "Auth session started {} seconds ago.".format(token_info["session"]["elapsed"]))
+    else:
+        logging.warning("Auth session time data not present or invalid.")
 
 print("")
 print("Token claims:")

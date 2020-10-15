@@ -1,9 +1,18 @@
+var authSessionVars;
+
+window.onload =
+    function () { requestAuthSession(); }
+
 document.getElementById('testme_button').onclick =
-    function () { sendRequest(); }
+    function () { getToken(); }
 
 
-function sendRequest() {
-    var url = localServerUrl + "?requestId=" + requestId
+function getToken() {
+    // add session variables when request token
+    var url = localServerUrl + "?"
+    for (var name in authSessionVars) {
+        url = url + "&" + name + "=" + authSessionVars[name]
+    }
 
     fillStatusDiv("Retrieving Web Padlock device token...")
 
@@ -117,3 +126,26 @@ function processTokenResult(msg) {
     );
 }
 
+
+function requestAuthSession() {
+    var url = "/start_auth";
+
+    var req = new XMLHttpRequest();
+    req.open("GET", url, true);
+    req.timeout = 500
+
+    req.onreadystatechange = function (oEvent) {
+        if (req.readyState === 4) {
+            if (req.status === 200) {
+                authSessionVars = JSON.parse(req.responseText);
+                for (var name in authSessionVars) {
+                    console.log(name + ": " + authSessionVars[name])
+                }
+            } else {
+                console.log("Error requesting new auth session.")
+            }
+        }
+    };
+
+    req.send(null);
+}

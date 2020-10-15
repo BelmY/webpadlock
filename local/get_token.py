@@ -20,8 +20,11 @@ def run():
     key = load_private(config["private_key"])
     cert = load_cert(config["certificate"])
 
-    requestdata = {}
-    requestdata["requestId"] = "f01253ff497eae7fa1555c34a822c2498835c58b"
+    requestdata = {
+        "nonce": "ZmGRFsniiPfDBxCewuBO",
+        "server_time": 1602753369,
+        "signature": "851e8ce1f3df8c40390cef3664d9b5b9575946a9"
+    }
 
     token = create_jwt(
         key,

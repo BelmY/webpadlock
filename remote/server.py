@@ -2,18 +2,18 @@
 # Web Padlock demo server
 #
 # (C) 2020 Reinoso Guzman, Madrid, Spain
-# Released under MIT License
 # -----------------------------------------------------------
 
 import json
 import time
 import logging
-from flask import Flask, request, render_template, session
+from flask import Flask, request, render_template
 
 from libs.config import get_config
 from libs.randomstr import get_random_string
 from libs.utils import load_file
 from libs.jwtchecks import process_token
+from libs.stateless import new_auth_session, check_auth_session
 
 global config
 global pem_ca_chain
@@ -26,12 +26,31 @@ app = Flask(__name__,
 
 @app.route('/check')
 def check():
+    """ Validates a token.
+    Method GET.
+    URL parameters: token
+    Return json object.
+    """
     token = request.args.get("token")
     if (token is None):
         return ("Bad Request", 400)
     else:
-        token_info = process_token(token, pem_ca_chain)
+        token_info = process_token(
+            token, pem_ca_chain, config["session_secret"])
         return json.dumps(token_info), 200
+
+
+@app.route('/start_auth')
+def start_auth():
+    """
+    Creates a new stateless auth session.
+    Method: GET
+    Parameters: none
+    Return: variables to insert in the token request.
+    """
+    sessionvars = new_auth_session(config["session_secret"])
+    return json.dumps(sessionvars), 200
+
 
 # -------------
 # Demo pages. Do not use them in production.
@@ -40,8 +59,6 @@ def check():
 
 @app.route('/')
 def home():
-    session['requestId'] = get_random_string(20)
-    session['timeof'] = int(time.time())
     return render_template("index.html",
                            local_server_url=config["local_server_url"])
 
@@ -96,7 +113,7 @@ def webcheck(token):
     msg = []
     status = 200
 
-    token_info = process_token(token, pem_ca_chain)
+    token_info = process_token(token, pem_ca_chain, config["session_secret"])
 
     # Check token signature
     if token_info["token"]["validation"]["error"] == 0:
@@ -121,28 +138,31 @@ def webcheck(token):
         msg.append(["DANGER", "Certificate/Host name mismatch."])
         status = 401
 
-    # Check that this response is for my last request
-    try:
-        if token_info["token"]["claims"]["requestdata"]["requestId"] == session["requestId"]:
-            msg.append(["SUCCESS", "Token is for the expected request."])
-        else:
-            msg.append(["DANGER", "Token is for another request."])
-            status = 401
-
-    except Exception:
-        msg.append(["DANGER", "Token format unknown."])
-        status = 401
-
-    # Check that this token is issued in the next 10 seconds of the request
-    # Not match the device time, because it could be off-time.
-    # Use the request session timeof instead.
-
-    if int(time.time()) - session["timeof"] < 10:
-        msg.append(["SUCCESS", "Token is on-time."])
+    # Check auth vars present in the token
+    if token_info["session"]["present"]:
+        msg.append(["SUCCESS", "Valid auth session data."])
     else:
-        msg.append(["WARNING", "Token wait expired, reload the page."])
+        msg.append(["DANGER", "Invalid auth session data."])
         status = 401
 
+    # Check auth session age (10 seconds max)
+    if token_info["session"]["present"]:
+        elapsed = token_info["session"]["elapsed"]
+        if elapsed < 10:
+            msg.append([
+                "SUCCESS", "Auth session is recent ({}s).".format(elapsed)
+            ])
+        else:
+            msg.append([
+                "WARNING",
+                "Auth session is old ({}s). Reload the page.".format(elapsed)
+            ])
+            status = 401
+    else:
+        msg.append(["DANGER", "Auth session time data not present."])
+        status = 401
+
+    # Dump token claims
     msg.append(["INFO", "Token claims are: <pre>" +
                 json.dumps(
                     token_info["token"]["claims"],

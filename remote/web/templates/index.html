@@ -7,7 +7,6 @@
     <title>Web Padlock demo page</title>
 
     <script>
-        var requestId = "{{ session.requestId }}"
         var localServerUrl = "{{ local_server_url }}"
     </script>
 
@@ -17,7 +16,7 @@
 
 
 <body>
-    <div class="container bg-light">
+    <div class="container bg-light pb-1 pt-1">
         <div class="jumbotron">
             <h1 class="display-4">Web Padlock demo page</h1>
             <p class="lead">You can login only from a <em>corporate</em> device. Visit
@@ -25,8 +24,8 @@
                     GitHub repository</a> for more information.
             </p>
             <hr class="my-4">
-            <p>Please hit <em>test me</em> button.</p>
-            <button class="btn btn-primary btn-lg" id="testme_button">Test me</button>
+            <!-- <p>Please hit <em>test me</em> button.</p> -->
+            <button class="btn btn-primary btn-lg" id="testme_button">Test my device</button>
         </div>
 
         <div id="status_div"></div>

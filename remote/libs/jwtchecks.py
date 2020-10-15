@@ -1,15 +1,18 @@
 from jwcrypto import jws
 from .crypto import verify_pem_chain, validate_token, get_cert_data
+from .stateless import check_auth_session
+
 
 # Here you can add all the additional checks you need, based on token.
 
 
-def process_token(token, pem_ca_chain):
+def process_token(token, pem_ca_chain, secret):
     """
     Make all the token comprobations.
-    Input: 
+    Input:
         token: serialized WebPadlock token
         pem_ca_chan: array of PEM trusted certificates
+        secret: secret key to sign auth sessions
     Output: dictionary, read the documentation.
     """
 
@@ -22,6 +25,10 @@ def process_token(token, pem_ca_chain):
         "x509": {
             "validation": None,
             "data": None
+        },
+        "session": {
+            "present": False,
+            "elapsed": None
         }
     }
 
@@ -59,5 +66,16 @@ def process_token(token, pem_ca_chain):
             "error": 1,
             "message": "Certificate chain verification failed: {}".format(e)
         }
+
+    # Check if auth vars present in the token
+    try:
+        elapsed = check_auth_session(claims["requestdata"], secret)
+        if elapsed is None:
+            response["session"]["present"] = False
+        else:
+            response["session"]["present"] = True
+            response["session"]["elapsed"] = elapsed
+    except Exception:
+        response["session"]["present"] = False
 
     return response
