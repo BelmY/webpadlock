@@ -55,32 +55,50 @@ Validate a saved token.
 
 ## Server endpoints
 
-### /
+### GET /start_auth
 
-Demo server's home page
+Return a stateles authenticacion session. Like this:
+    {
+        "nonce": "fTZSEuHtEBPzzpWrgNEF",
+        "server_time": "1602760264",
+        "signature": "88bb5d9c099e9f4c683467a5f98d83c9df218df6"
+    }
 
-### /check?token=
+`Nonce` is a random string to prevent replay attacks.
+`server_time` is the current server timestamp. It allows the server calculate the time elapsed from this session when the token arrives back to it.
+And `signature` is a SHA1-HMAC function of the data above. The key is in configuration file.
 
-Return a status html message for the demo service.
+You should call this endpoint just before request a token from the local agent. And don't forget include this variables in the request:
 
-### /jsoncheck?token=
+   http://127.0.0.1:3000/deviceinfo?nonce=...&server_time=...&signature=...
 
-Return raw information in JSON format. Then you can make all validations you want.
+
+### GET /check?token=
+
+Return a JSON object with basic validations. You can then add others validations you want.
+
+The returned object is:
 
     {
+        "session": {
+            "elapsed": 29,
+            "present": true
+        },
         "token": {
             "claims": {
-                "iat": 1602690016,
+                "iat": 1602759941,
                 "metadata": {
                     "name": "Web Padlock",
-                    "tokenid": "KHHiHhbOpCRYBXQuRwrDVdlLMDBrBUEulhoMgsLI",
+                    "tokenid": "JvJJMzusUAhzRNRTNefahxTlPvkDNtCjnEAhuUSB",
                     "version": {
                         "mayor": "1",
                         "minor": "0"
                     }
                 },
                 "requestdata": {
-                    "requestId": "UrXiMGLvBeUSaTxNoHqv"
+                    "nonce": "EjxHZFTutvCPPjrNlifK",
+                    "server_time": "1602759912",
+                    "signature": "0225e0b1fb5ca7c12216d40228cb580575bd47c1"
                 },
                 "systeminfo": {
                     "hostname": "hostname",
@@ -110,7 +128,14 @@ Return raw information in JSON format. Then you can make all validations you wan
         }
     }
 
+### GET /
+
+Demo server's home page
+
+### GET /democheck?token=
+
+Return a formated html message for the demo service.
+
 ## Todo
 
 - improve documentation
-- better looking website
