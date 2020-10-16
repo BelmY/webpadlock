@@ -11,9 +11,9 @@ More about them below.
 
 ## Public demo
 
-If you only want to try this software and you are using Windows, just download the [latest release](https://github.com/electronicayciencia/webpadlock/releases).
+If you only want to try this software and you are using Windows or Linux, just download the [latest release](https://github.com/electronicayciencia/webpadlock/releases).
 
-If you are using Linux or Mac, please [download the code](https://github.com/electronicayciencia/webpadlock/archive/main.zip) and follow the instructions in [Local README running from source](/local/README.md#from-source).
+If you are using Mac, please [download the code](https://github.com/electronicayciencia/webpadlock/archive/main.zip) and follow the instructions in [Local README running from source](/local/README.md#from-source).
 
 You will need:
 
@@ -36,27 +36,27 @@ To check the local agent, navigate to <http://127.0.0.1:3000/>. The server will 
         }
     }
 
-Now visit the public demo server at <https://webpadlock.herokuapp.com/> and press the `Test me` button.
+Now visit the public demo server at <https://webpadlock.herokuapp.com/> and press the `Test my device` button.
 
 ![Login failed](/img/warnings.png)
 
-The output will be **Device not allowed**, of course. Because of
+The output will be **Device not allowed**. Because of
 
     WARNING: Certificate/Host name mismatch.
 
 Fair enough, the example certificate does not match your hostname. But the token claims are displayed anyways.
 
-If you want to dig deeper, you can run a local instance of the remote server, setup your own CA and the appropiate certificate for your hosts.
+If you want to dive deeper, you can run a local instance of the remote server, setup your own CA and the appropiate certificate for your hosts.
 
 ## Description
 
 ### Local service
 
-The key piece of this software is a x509 certificate, signed by some private CA and its key.
+The key piece of this software is a private key and its x509 certificate, signed by some internal CA.
 
-Each device must have its own certificate. The CN must be equal to the hostname. Ideally, the key must not be exportable. You can use some sort of Management Software, system permissions or hardware TPM to prevent that.
+Each device must have its own certificate. Since the CN must be equal to the hostname. Ideally, the key must not be exportable. To prevent that, you can use some sort of Management Software, system permissions or hardware TPM.
 
-The local server creates a token with information about the host system, software metadata and all request parameters. The token is signed using the certificate's private key. And the certificate itself is added to the x5c header.
+The local server creates a token with information about the host system, software metadata and a copy of all request parameters. The token is then signed using the certificate's private key. And the certificate itself is added to the x5c header.
 
 Please see [Local README](/local/README.md) for a more detalied explanation.
 
@@ -64,11 +64,16 @@ Please see [Local README](/local/README.md) for a more detalied explanation.
 
 The remote server validates the token signature using the device's x509 certificate present in the token itself.
 
-Then it ensures this certificate is valid and signed by our private CA. And the host name in the token claims matches with the CN.
+Then it ensures this certificate is valid and signed by our CA. 
 
-The remote acces control can use the verified token claims and make aditional validations. Like the request parameters on the signed token are the same from the request to prevent replay attacks. Check if the timing is short enought or wether the operating system is approved.
+After that, it serachs for a stateless session in the token. If it is present, it also check its signature and calculate the elapsed time.
 
-In the demo server page the button named "test me" call a funcion that requests a token from the local server and send it back to the demo  server. Applies validations and writes an HTML message.
+The output of the API is a JSON with all the information. The remote access control system can use this jsno to make aditional compliance checks. Like:
+
+- The host name in the token claims matches with the CN.
+- The certificate is valid
+- The timing is short enought 
+- Wether the operating system is approved or not.
 
 For more information read [Remote README](/remote/README.md).
 
