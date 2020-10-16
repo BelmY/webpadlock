@@ -36,7 +36,7 @@ To check the local agent, navigate to <http://127.0.0.1:3000/>. The server will 
 
 Now visit the public demo server at <https://webpadlock.herokuapp.com/> and press the `Test me` button.
 
-![Login failed](/img/warnings.jpg)
+![Login failed](/img/warnings.png)
 
 The output will be **Device not allowed**, of course. Because of
 
@@ -154,11 +154,11 @@ If you change the domain (or use localhost instead of IP) don't forget to it to 
 
 Run both local and remote servers. Open [http://127.0.0.1:10000/](http://127.0.0.1:10000/).
 
-![Test-me button](/img/test-me.jpg)
+![Test-me button](/img/test-me.png)
 
 If all goes right a message like this will appear when you click test-me:
 
-![Success](/img/success.jpg)
+![Success](/img/success.png)
 
 ## Distribution
 
