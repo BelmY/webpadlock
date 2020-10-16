@@ -11,7 +11,9 @@ More about them below.
 
 ## Public demo
 
-If you only want to try this software, just download the [latest release](https://github.com/electronicayciencia/webpadlock/releases).
+If you only want to try this software and you are using Windows, just download the [latest release](https://github.com/electronicayciencia/webpadlock/releases).
+
+If you are using Linux or Mac, please [download the code](https://github.com/electronicayciencia/webpadlock/archive/main.zip) and follow the instructions in [Local README running from source](/local/README.md#from-source).
 
 You will need:
 

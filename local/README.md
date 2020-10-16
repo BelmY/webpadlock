@@ -16,11 +16,19 @@ Put all of them in the same folder and run `server.exe`.
 
 ### From source
 
+You will need Python 3.
+
 Install requirements:
 
     pip install -r requirements.txt
 
+If you have got Python2 and Python3, remember to use `pip3` command to install requirements.
+
 Run `server.py`.
+
+    python server.py
+
+Same, you might need to launch `python3` command instead of just `python`.
 
 ## API endpoints
 
@@ -30,7 +38,7 @@ Return a json with metadata. See below *metadata claim*.
 
 ### Device information (/deviceinfo)
 
-Return a JWT with information, signed with private key. Arbitrary parameters. For example:
+Return a JWT with information, signed with private key. Need at least one URL parameter. But it is indifferent. For example:
 
     http://127.0.0.1:3000/deviceinfo?nonce=ggg&timestamp=yyy
 
@@ -83,4 +91,4 @@ Example:
 - document config options
 - daemonize
 - check key permissions
-- integration with hardware TPM
+- sign the token using hardware TPM when available
