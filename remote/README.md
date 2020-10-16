@@ -142,6 +142,7 @@ The returned object is:
                 "issuer": "CN=CA Pruebas Intermediate,O=CA Pruebas,ST=Madrid,C=ES",
                 "not_valid_after": "2021-10-23T09:21:30",
                 "not_valid_before": "2020-10-13T09:21:30",
+                "serial": 4104,
                 "subject": "CN=workstation001,O=WebPadlock,C=ES"
             },
             "validation": {

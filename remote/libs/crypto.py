@@ -13,6 +13,7 @@ def get_cert_data(pem_data):
     data = {}
     cert = x509.load_pem_x509_certificate(pem_data)
     data["issuer"] = cert.issuer.rfc4514_string()
+    data["serial"] = cert.serial_number
     data["subject"] = cert.subject.rfc4514_string()
     data["not_valid_after"] = cert.not_valid_after.isoformat()
     data["not_valid_before"] = cert.not_valid_before.isoformat()
