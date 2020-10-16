@@ -1,4 +1,5 @@
 import os
+import getpass
 import platform
 
 
@@ -7,7 +8,7 @@ def get_systeminfo():
     Pay attention to cross platform issues."""
     info = {}
     info["hostname"] = platform.node()
-    info["user"] = os.getlogin()
+    info["user"] = getpass.getuser()
     info["osname"] = platform.system()
     info["osrelease"] = platform.release()
     info["osversion"] = platform.version()
