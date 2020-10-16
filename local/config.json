@@ -1,7 +1,8 @@
 {
     "allowed_requesters": [
         "http://127.0.0.1:10000",
-        "https://webpadlock.herokuapp.com"
+        "https://webpadlock.herokuapp.com",
+        "http://webpadlock.herokuapp.com"
     ],
     "private_key": "workstation001.key.pem",
     "certificate": "workstation001.cert.pem",
