@@ -68,6 +68,7 @@ CLI command to validate a saved token.
 ### GET /start_auth
 
 Return a stateles authenticacion session. Like this:
+
     {
         "nonce": "fTZSEuHtEBPzzpWrgNEF",
         "server_time": "1602760264",
